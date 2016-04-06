@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">My Notifications</string>
+    <string name="name">Name</string>
+    <string name="every">Every</string>
+    <string name="monday">Mon</string>
+    <string name="tuesday">Tue</string>
+    <string name="wednesday">Wed</string>
+    <string name="thursday">Thu</string>
+    <string name="friday">Fri</string>
+    <string name="saturday">Sat</string>
+    <string name="sunday">Sun</string>
+    <string name="save">Save</string>
+    <string name="at">at</string>
+    <string name="events">events</string>
+    <string name="delete">Delete</string>
+    <string name="alarm">Alarm</string>
+    <string name="edit_notification">Edit Notification</string>
+</resources>
