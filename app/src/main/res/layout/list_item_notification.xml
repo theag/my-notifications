@@ -16,6 +16,9 @@
         android:layout_weight="1"
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:textColor="@android:color/black"
+        android:paddingTop="7dp"
+        android:paddingBottom="7dp"
+        android:text="sample"
         android:clickable="true"/>
 
     <Switch
