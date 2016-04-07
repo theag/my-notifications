@@ -22,15 +22,20 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+import com.mynotifications.notifications.MyNotification;
+import com.mynotifications.notifications.NotificationControl;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 public class EditActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener,
-        TimePickerDialog.OnTimeSetListener, DatePickerDialog.OnDateSetListener {
+        TimePickerDialog.OnTimeSetListener, DatePickerFragment.OnDateSetListener {
 
     public static final String ARG_INDEX = "index";
     private static final int[] weekdayIDs = {R.id.switch_monday, R.id.switch_tuesday, R.id.switch_wednesday, R.id.switch_thursday, R.id.switch_friday, R.id.switch_saturday, R.id.switch_sunday};
+    private static final String DIALOG_UNTIL = "dialog until";
+    private static final String DIALOG_START_DATE = "dialog start date";
     private int daySwitchCount;
     private int index;
     private SimpleDateFormat timeParser;
@@ -43,9 +48,16 @@ public class EditActivity extends AppCompatActivity implements AdapterView.OnIte
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         timeParser = new SimpleDateFormat("h:mm aa");
-        dateParser = new SimpleDateFormat("MMM d, yyyy");
+        dateParser = new SimpleDateFormat("EEE, MMM d, yyyy");
 
-        Spinner spinner = (Spinner)findViewById(R.id.spinner_repeat_choice);
+        //todo: make a new adapter to display icon and text in dropdown and just icon in spinner
+        Spinner spinner;/* = (Spinner)findViewById(R.id.spinner_repeat_choice);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.repeat_choice, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);*/
+
+        spinner = (Spinner)findViewById(R.id.spinner_repeat_choice);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
                 R.array.repeat_choice, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -76,6 +88,8 @@ public class EditActivity extends AppCompatActivity implements AdapterView.OnIte
             Calendar calendar = Calendar.getInstance();
             TextView tv = (TextView)findViewById(R.id.text_time);
             tv.setText(timeParser.format(calendar.getTime()));
+            tv = (TextView)findViewById(R.id.text_date);
+            tv.setText(dateParser.format(calendar.getTime()));
             int day = calendar.get(Calendar.DAY_OF_WEEK);
             switch(day) {
                 case Calendar.MONDAY:
@@ -107,7 +121,7 @@ public class EditActivity extends AppCompatActivity implements AdapterView.OnIte
             et = (EditText)findViewById(R.id.edit_for_count);
             et.setText("5");
         } else {
-            MyNotification note = MyNotification.get(index);
+            MyNotification note = NotificationControl.get(index);
             EditText et = (EditText)findViewById(R.id.edit_name);
             et.setText(note.name);
             spinner = (Spinner)findViewById(R.id.spinner_repeat_choice);
@@ -115,14 +129,16 @@ public class EditActivity extends AppCompatActivity implements AdapterView.OnIte
             Switch sw = (Switch)findViewById(R.id.switch_enabled);
             sw.setChecked(note.enabled);
             et = (EditText)findViewById(R.id.edit_repeat_count);
-            et.setText(""+note.repeatCount);
+            et.setText("" + note.repeatCount);
             TextView tv = (TextView)findViewById(R.id.text_time);
             tv.setText(timeParser.format(note.getStartDate()));
+            tv = (TextView)findViewById(R.id.text_date);
+            tv.setText(dateParser.format(note.getStartDate()));
             daySwitchCount = 0;
             for(int i = 0; i < 7; i++) {
                 sw = (Switch)findViewById(weekdayIDs[i]);
-                sw.setChecked(note.repeatDays[i]);
-                if(note.repeatDays[i]) {
+                sw.setChecked(note.doesRepeatOn_a(i));
+                if(sw.isChecked()) {
                     daySwitchCount++;
                 }
             }
@@ -148,7 +164,7 @@ public class EditActivity extends AppCompatActivity implements AdapterView.OnIte
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
             case R.id.action_delete:
-                MyNotification.remove(this, index);
+                NotificationControl.remove(this, index);
                 setResult(RESULT_OK);
                 finish();
                 return true;
@@ -203,7 +219,22 @@ public class EditActivity extends AppCompatActivity implements AdapterView.OnIte
                     ex.printStackTrace();
                 }
                 frag.setArguments(args);
-                frag.show(getSupportFragmentManager(), "dialog");
+                frag.show(getSupportFragmentManager(), DIALOG_UNTIL);
+                break;
+            case R.id.text_date:
+                frag = new DatePickerFragment();
+                args = new Bundle();
+                try {
+                    Calendar current = Calendar.getInstance();
+                    current.setTime(dateParser.parse(((TextView) findViewById(R.id.text_date)).getText().toString()));
+                    args.putInt(DatePickerFragment.ARG_YEAR, current.get(Calendar.YEAR));
+                    args.putInt(DatePickerFragment.ARG_MONTH, current.get(Calendar.MONTH));
+                    args.putInt(DatePickerFragment.ARG_DAY, current.get(Calendar.DAY_OF_MONTH));
+                } catch (ParseException ex) {
+                    ex.printStackTrace();
+                }
+                frag.setArguments(args);
+                frag.show(getSupportFragmentManager(), DIALOG_START_DATE);
                 break;
         }
     }
@@ -255,12 +286,20 @@ public class EditActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     @Override
-    public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+    public void onDateSet(String tag, int year, int monthOfYear, int dayOfMonth) {
         Calendar current = Calendar.getInstance();
         current.set(Calendar.YEAR, year);
         current.set(Calendar.MONTH, monthOfYear);
         current.set(Calendar.DAY_OF_MONTH, dayOfMonth);
-        TextView tv = (TextView)findViewById(R.id.text_until);
+        TextView tv = null;
+        switch(tag) {
+            case DIALOG_UNTIL:
+                tv = (TextView)findViewById(R.id.text_until);
+                break;
+            case DIALOG_START_DATE:
+                tv = (TextView)findViewById(R.id.text_date);
+                break;
+        }
         tv.setText(dateParser.format(current.getTime()));
     }
 
@@ -268,11 +307,12 @@ public class EditActivity extends AppCompatActivity implements AdapterView.OnIte
         if(!validateForSave()) {
             return;
         }
+        SimpleDateFormat parser = new SimpleDateFormat("h:mm aa MMM d, yyyy");
         MyNotification note;
         if(index < 0) {
-            note = MyNotification.makeNew();
+            note = NotificationControl.makeNew();
         } else {
-            note = MyNotification.get(index);
+            note = NotificationControl.get(index);
         }
         EditText et = (EditText)findViewById(R.id.edit_name);
         note.name = et.getText().toString();
@@ -284,24 +324,30 @@ public class EditActivity extends AppCompatActivity implements AdapterView.OnIte
         note.repeatCount = Integer.parseInt(et.getText().toString());
         TextView tv = (TextView)findViewById(R.id.text_time);
         String whenText = tv.getText().toString();
+        tv = (TextView)findViewById(R.id.text_date);
+        try {
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(parser.parse(whenText +" " +tv.getText().toString()));
+            note.setStartTime(cal);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
         for(int i = 0; i < 7; i++) {
             sw = (Switch)findViewById(weekdayIDs[i]);
-            note.repeatDays[i] = sw.isChecked();
+            note.setRepeatOn_a(i, sw.isChecked());
         }
         spinner = (Spinner)findViewById(R.id.spinner_repeat_until);
         note.untilChoice = spinner.getSelectedItemPosition();
         tv = (TextView)findViewById(R.id.text_until);
-        whenText += " " +tv.getText().toString();
-        et = (EditText)findViewById(R.id.edit_for_count);
-        note.untilCount = Integer.parseInt(et.getText().toString());
-        SimpleDateFormat parser = new SimpleDateFormat("h:mm aa MMM d, yyyy");
         try {
             Calendar cal = Calendar.getInstance();
-            cal.setTime(parser.parse(whenText));
-            note.setTime(cal);
+            cal.setTime(parser.parse(whenText +" " +tv.getText().toString()));
+            note.setUntilTime(cal);
         } catch (ParseException e) {
             e.printStackTrace();
         }
+        et = (EditText)findViewById(R.id.edit_for_count);
+        note.untilCount = Integer.parseInt(et.getText().toString());
         note.reset(this);
         setResult(RESULT_OK);
         finish();
@@ -321,10 +367,24 @@ public class EditActivity extends AppCompatActivity implements AdapterView.OnIte
             errors += "\n" +errorCount +". Repeat count cannot be blank";
         }
         Spinner spinner = (Spinner)findViewById(R.id.spinner_repeat_choice);
-        if(spinner.getSelectedItemPosition() == 1) {
+        if(spinner.getSelectedItemPosition() == MyNotification.WEEKLY) {
             if(daySwitchCount == 0) {
                 errorCount++;
                 errors += "\n" +errorCount +". Must select a day to repeat on";
+            } else {
+                Calendar cal = Calendar.getInstance();
+                TextView tv = (TextView)findViewById(R.id.text_date);
+                try {
+                    cal.setTime(dateParser.parse(tv.getText().toString()));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+                int weekday = MyNotification.getWeekDay_a(cal);
+                Switch sw = (Switch)findViewById(weekdayIDs[weekday]);
+                if(!sw.isChecked()) {
+                    errorCount++;
+                    errors += "\n" +errorCount +". Must start on one of the selected weekdays";
+                }
             }
         }
         spinner = (Spinner)findViewById(R.id.spinner_repeat_until);

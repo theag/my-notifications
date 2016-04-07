@@ -1,12 +1,6 @@
 package com.mynotifications;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -16,11 +10,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import com.mynotifications.notifications.MyNotification;
+import com.mynotifications.notifications.NotificationControl;
 
 public class MainActivity extends AppCompatActivity implements NotificationsAdapter.OnItemClickListener {
+
+    public static final int[] iconIDs = {R.drawable.ic_notifications_on_24dp, R.drawable.ic_dawn_24dp, R.drawable.ic_wb_sunny_24dp, R.drawable.ic_night_24dp, R.drawable.ic_favorite_24dp, R.drawable.ic_work_24dp};
+    public static final String[] iconNames = {"Default", "Morning", "Day", "Night", "Heart", "Work"};
 
     private static final int REQUEST_NEW = 1;
     private static final int REQUEST_EDIT = 2;
@@ -32,7 +28,7 @@ public class MainActivity extends AppCompatActivity implements NotificationsAdap
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        MyNotification.loadIfNull(this, getFilesDir());
+        NotificationControl.loadIfNull(this, getFilesDir());
 
         ListView lv = (ListView)findViewById(R.id.listView);
         adapter = new NotificationsAdapter(this);
@@ -74,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements NotificationsAdap
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        MyNotification.save(getFilesDir());
+        NotificationControl.save(getFilesDir());
     }
 
     @Override
@@ -109,7 +105,7 @@ public class MainActivity extends AppCompatActivity implements NotificationsAdap
 
     @Override
     public void onEnabledClick(int position, boolean enabled) {
-        MyNotification note = MyNotification.get(position);
+        MyNotification note = NotificationControl.get(position);
         note.enabled = enabled;
         note.reset(this);
     }

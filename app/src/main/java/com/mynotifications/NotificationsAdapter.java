@@ -9,6 +9,9 @@ import android.widget.ListAdapter;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.mynotifications.notifications.MyNotification;
+import com.mynotifications.notifications.NotificationControl;
+
 /**
  * Created by nbp184 on 2016/04/05.
  */
@@ -30,12 +33,12 @@ public class NotificationsAdapter extends BaseAdapter implements ListAdapter, Vi
 
     @Override
     public int getCount() {
-        return MyNotification.getCount();
+        return NotificationControl.getCount();
     }
 
     @Override
     public MyNotification getItem(int position) {
-        return MyNotification.get(position);
+        return NotificationControl.get(position);
     }
 
     @Override
@@ -52,9 +55,12 @@ public class NotificationsAdapter extends BaseAdapter implements ListAdapter, Vi
         }
         TextView tv = (TextView)view.findViewById(R.id.text_position);
         tv.setText(""+position);
+        view.findViewById(R.id.layout_click_me).setOnClickListener(this);
         MyNotification note = getItem(position);
         tv = (TextView)view.findViewById(R.id.text_name);
         tv.setText(note.name);
+        tv = (TextView)view.findViewById(R.id.text_details);
+        tv.setText(note.getDetails());
         tv.setOnClickListener(this);
         Switch sw = (Switch)view.findViewById(R.id.switch_enabled);
         sw.setChecked(note.enabled);
@@ -67,7 +73,7 @@ public class NotificationsAdapter extends BaseAdapter implements ListAdapter, Vi
         if(listener != null) {
             int position = getPosition(v);
             switch(v.getId()) {
-                case R.id.text_name:
+                case R.id.layout_click_me:
                     listener.onNameClick(position);
                     break;
                 case R.id.switch_enabled:
@@ -78,7 +84,7 @@ public class NotificationsAdapter extends BaseAdapter implements ListAdapter, Vi
     }
 
     private int getPosition(View view) {
-        ViewGroup parent = (ViewGroup)view.getParent();
+        ViewGroup parent = (ViewGroup)view.getParent().getParent();
         TextView pos = (TextView)parent.findViewById(R.id.text_position);
         return Integer.parseInt(pos.getText().toString());
     }

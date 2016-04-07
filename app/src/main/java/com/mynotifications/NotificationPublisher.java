@@ -8,6 +8,9 @@ import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 
+import com.mynotifications.notifications.MyNotification;
+import com.mynotifications.notifications.NotificationControl;
+
 import java.text.SimpleDateFormat;
 
 /**
@@ -16,9 +19,9 @@ import java.text.SimpleDateFormat;
 public class NotificationPublisher extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        MyNotification.loadIfNull(context, context.getFilesDir());
+        NotificationControl.loadIfNull(context, context.getFilesDir());
 
-        MyNotification note = MyNotification.getNextAlarm();
+        MyNotification note = NotificationControl.getNextAlarm();
 
         Intent noteIntent = new Intent(context, AlarmActivity.class);
         noteIntent.putExtra(AlarmActivity.ARG_NAME, note.name);
@@ -27,8 +30,8 @@ public class NotificationPublisher extends BroadcastReceiver {
         stackBuilder.addParentStack(AlarmActivity.class);
         stackBuilder.addNextIntent(noteIntent);
         PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-        //SimpleDateFormat timeParser = new SimpleDateFormat("h:mm aa");
-        SimpleDateFormat timeParser = new SimpleDateFormat("MMM d, yyyy h:mm:ss:SS aa");
+        SimpleDateFormat timeParser = new SimpleDateFormat("h:mm aa");
+        //SimpleDateFormat timeParser = new SimpleDateFormat("MMM d, yyyy h:mm:ss:SS aa");
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
         builder.setSmallIcon(R.drawable.ic_notifications_on_24dp)
                 .setContentTitle(note.name)
@@ -40,7 +43,7 @@ public class NotificationPublisher extends BroadcastReceiver {
                 .setPriority(2)
                 .setOnlyAlertOnce(true);
 
-        note.nextCheck(context);
+        note.goToNextAndCheck(context);
 
         NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.notify(0, builder.build());

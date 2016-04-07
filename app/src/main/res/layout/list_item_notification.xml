@@ -9,21 +9,38 @@
         android:layout_height="wrap_content"
         android:visibility="gone"/>
 
-    <TextView
-        android:id="@+id/text_name"
+    <LinearLayout
+        android:id="@+id/layout_click_me"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="1"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:textColor="@android:color/black"
-        android:paddingTop="7dp"
-        android:paddingBottom="7dp"
-        android:text="sample"
-        android:clickable="true"/>
+        android:orientation="vertical"
+        android:clickable="true">
+
+        <TextView
+            android:id="@+id/text_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@android:color/black"
+            android:paddingTop="7dp"
+            android:paddingBottom="2dp"
+            android:text="sample" />
+
+        <TextView
+            android:id="@+id/text_details"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="7dp"
+            android:singleLine="true"
+            android:ellipsize="end"/>
+
+    </LinearLayout>
 
     <Switch
         android:id="@+id/switch_enabled"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"/>
 
 </LinearLayout>
