@@ -21,12 +21,14 @@ public class NotificationPublisher extends BroadcastReceiver {
         MyNotification note = MyNotification.getNextAlarm();
 
         Intent noteIntent = new Intent(context, AlarmActivity.class);
+        noteIntent.putExtra(AlarmActivity.ARG_NAME, note.name);
         noteIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
         stackBuilder.addParentStack(AlarmActivity.class);
         stackBuilder.addNextIntent(noteIntent);
         PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-        SimpleDateFormat timeParser = new SimpleDateFormat("h:mm aa");
+        //SimpleDateFormat timeParser = new SimpleDateFormat("h:mm aa");
+        SimpleDateFormat timeParser = new SimpleDateFormat("MMM d, yyyy h:mm:ss:SS aa");
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
         builder.setSmallIcon(R.drawable.ic_notifications_on_24dp)
                 .setContentTitle(note.name)

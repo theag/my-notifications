@@ -15,4 +15,5 @@
     <string name="delete">Delete</string>
     <string name="alarm">Alarm</string>
     <string name="edit_notification">Edit Notification</string>
+    <string name="refresh">Refresh</string>
 </resources>

@@ -7,6 +7,8 @@ import android.widget.TextView;
 
 public class AlarmActivity extends AppCompatActivity {
 
+    public static final String ARG_NAME = "name";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -16,13 +18,7 @@ public class AlarmActivity extends AppCompatActivity {
 
         MyNotification.loadIfNull(this, getFilesDir());
 
-        MyNotification note = MyNotification.getNextAlarm();
-        //note.nextCheck(this);
         TextView tv = (TextView)findViewById(R.id.text_alarm);
-        if(note != null) {
-            tv.setText(note.name);
-        } else {
-            tv.setText("no alarm");
-        }
+        tv.setText(getIntent().getStringExtra(ARG_NAME));
     }
 }

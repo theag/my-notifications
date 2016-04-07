@@ -158,6 +158,8 @@ public class MyNotification {
         }
 
         if(next != null) {
+            SimpleDateFormat parser = new SimpleDateFormat("MMM d, yyyy h:mm:ss:SS aa");
+            System.out.println("settting \"" +next.name +"\" at " +parser.format(next.start.getTime()));
             Intent intent = new Intent(context, NotificationPublisher.class);
             pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
             alarmManager.set(AlarmManager.RTC_WAKEUP, next.start.getTimeInMillis(), pendingIntent);
@@ -213,7 +215,7 @@ public class MyNotification {
             start.set(Calendar.MINUTE, until.get(Calendar.MINUTE));
             start.set(Calendar.SECOND, 0);
             start.set(Calendar.MILLISECOND, 0);
-            if (start.before(Calendar.getInstance())) {
+            if(start.before(Calendar.getInstance()) || repeatType == WEEKLY) {
                 goToNextAlarm();
             }
         }
@@ -269,7 +271,7 @@ public class MyNotification {
                 break;
         }
         SimpleDateFormat parser = new SimpleDateFormat("MMM d, yyyy h:mm:ss:SS aa");
-        System.out.println(parser.format(start.getTime()));
+        System.out.println("get next: " +parser.format(start.getTime()));
     }
 
     private int getWeekDay(Calendar when) {
@@ -307,7 +309,7 @@ public class MyNotification {
         start.set(Calendar.MINUTE, cal.get(Calendar.MINUTE));
         start.set(Calendar.SECOND, 0);
         start.set(Calendar.MILLISECOND, 0);
-        if(start.before(Calendar.getInstance())) {
+        if(start.before(Calendar.getInstance()) || repeatType == WEEKLY) {
             goToNextAlarm();
         }
         until.set(Calendar.YEAR, cal.get(Calendar.YEAR));

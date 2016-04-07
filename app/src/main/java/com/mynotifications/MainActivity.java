@@ -7,8 +7,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
 
@@ -21,6 +25,7 @@ public class MainActivity extends AppCompatActivity implements NotificationsAdap
     private static final int REQUEST_NEW = 1;
     private static final int REQUEST_EDIT = 2;
     private NotificationsAdapter adapter;
+    private SwipeRefreshLayout refresh;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,14 +34,41 @@ public class MainActivity extends AppCompatActivity implements NotificationsAdap
 
         MyNotification.loadIfNull(this, getFilesDir());
 
-        /*Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.WEEK_OF_MONTH, 8);
-        SimpleDateFormat parser = new SimpleDateFormat("MMM d, yyyy h:mm:ss aa");
-        System.out.println(parser.format(cal.getTime()));*/
-
         ListView lv = (ListView)findViewById(R.id.listView);
         adapter = new NotificationsAdapter(this);
         lv.setAdapter(adapter);
+
+        refresh = (SwipeRefreshLayout)findViewById(R.id.refresh_list);
+        refresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                refreshList();
+            }
+        });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch(item.getItemId()) {
+            case R.id.action_refresh:
+                refresh.setRefreshing(true);
+                refreshList();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void refreshList() {
+        adapter.notifyDataSetChanged();
+        refresh.setRefreshing(false);
     }
 
     @Override
