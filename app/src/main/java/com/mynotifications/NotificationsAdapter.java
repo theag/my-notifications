@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -54,11 +55,15 @@ public class NotificationsAdapter extends BaseAdapter implements ListAdapter, Vi
             view = inflater.inflate(R.layout.list_item_notification, null);
         }
         TextView tv = (TextView)view.findViewById(R.id.text_position);
-        tv.setText(""+position);
+        tv.setText("" + position);
         view.findViewById(R.id.layout_click_me).setOnClickListener(this);
         MyNotification note = getItem(position);
+        ImageView iv = (ImageView)view.findViewById(R.id.image_icon);
+        iv.setImageDrawable(context.getDrawable(IconAdapter.iconIDs[note.iconIndex]));
+        iv.setOnClickListener(this);
         tv = (TextView)view.findViewById(R.id.text_name);
         tv.setText(note.name);
+        tv.setOnClickListener(this);
         tv = (TextView)view.findViewById(R.id.text_details);
         tv.setText(note.getDetails());
         tv.setOnClickListener(this);
@@ -73,11 +78,11 @@ public class NotificationsAdapter extends BaseAdapter implements ListAdapter, Vi
         if(listener != null) {
             int position = getPosition(v);
             switch(v.getId()) {
-                case R.id.layout_click_me:
-                    listener.onNameClick(position);
-                    break;
                 case R.id.switch_enabled:
                     listener.onEnabledClick(position, ((Switch)v).isChecked());
+                    break;
+                default:
+                    listener.onNameClick(position);
                     break;
             }
         }

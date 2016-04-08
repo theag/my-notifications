@@ -50,12 +50,8 @@ public class EditActivity extends AppCompatActivity implements AdapterView.OnIte
         timeParser = new SimpleDateFormat("h:mm aa");
         dateParser = new SimpleDateFormat("EEE, MMM d, yyyy");
 
-        //todo: make a new adapter to display icon and text in dropdown and just icon in spinner
-        Spinner spinner;/* = (Spinner)findViewById(R.id.spinner_repeat_choice);
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.repeat_choice, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);*/
+        Spinner spinner = (Spinner)findViewById(R.id.spinner_icons);
+        spinner.setAdapter(new IconAdapter(this));
 
         spinner = (Spinner)findViewById(R.id.spinner_repeat_choice);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
@@ -124,6 +120,8 @@ public class EditActivity extends AppCompatActivity implements AdapterView.OnIte
             MyNotification note = NotificationControl.get(index);
             EditText et = (EditText)findViewById(R.id.edit_name);
             et.setText(note.name);
+            spinner = (Spinner)findViewById(R.id.spinner_icons);
+            spinner.setSelection(note.iconIndex);
             spinner = (Spinner)findViewById(R.id.spinner_repeat_choice);
             spinner.setSelection(note.repeatType);
             Switch sw = (Switch)findViewById(R.id.switch_enabled);
@@ -318,6 +316,8 @@ public class EditActivity extends AppCompatActivity implements AdapterView.OnIte
         note.name = et.getText().toString();
         Spinner spinner = (Spinner)findViewById(R.id.spinner_repeat_choice);
         note.repeatType = spinner.getSelectedItemPosition();
+        spinner = (Spinner)findViewById(R.id.spinner_icons);
+        note.iconIndex = spinner.getSelectedItemPosition();
         Switch sw = (Switch)findViewById(R.id.switch_enabled);
         note.enabled = sw.isChecked();
         et = (EditText)findViewById(R.id.edit_repeat_count);

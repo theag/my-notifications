@@ -15,9 +15,6 @@ import com.mynotifications.notifications.NotificationControl;
 
 public class MainActivity extends AppCompatActivity implements NotificationsAdapter.OnItemClickListener {
 
-    public static final int[] iconIDs = {R.drawable.ic_notifications_on_24dp, R.drawable.ic_dawn_24dp, R.drawable.ic_wb_sunny_24dp, R.drawable.ic_night_24dp, R.drawable.ic_favorite_24dp, R.drawable.ic_work_24dp};
-    public static final String[] iconNames = {"Default", "Morning", "Day", "Night", "Heart", "Work"};
-
     private static final int REQUEST_NEW = 1;
     private static final int REQUEST_EDIT = 2;
     private NotificationsAdapter adapter;
