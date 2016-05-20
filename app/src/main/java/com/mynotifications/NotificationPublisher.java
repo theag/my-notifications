@@ -33,7 +33,7 @@ public class NotificationPublisher extends BroadcastReceiver {
         SimpleDateFormat timeParser = new SimpleDateFormat("h:mm aa");
         //SimpleDateFormat timeParser = new SimpleDateFormat("MMM d, yyyy h:mm:ss:SS aa");
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-        builder.setSmallIcon(R.drawable.ic_notifications_on_24dp)
+        builder.setSmallIcon(IconAdapter.iconIDs[note.iconIndex])
                 .setContentTitle(note.name)
                 .setContentText(timeParser.format(note.getStartDate()))
                 .setContentIntent(resultPendingIntent)

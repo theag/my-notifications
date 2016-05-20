@@ -305,7 +305,7 @@ public class EditActivity extends AppCompatActivity implements AdapterView.OnIte
         if(!validateForSave()) {
             return;
         }
-        SimpleDateFormat parser = new SimpleDateFormat("h:mm aa MMM d, yyyy");
+        SimpleDateFormat parser = new SimpleDateFormat("h:mm aa EEE, MMM d, yyyy");
         MyNotification note;
         if(index < 0) {
             note = NotificationControl.makeNew();

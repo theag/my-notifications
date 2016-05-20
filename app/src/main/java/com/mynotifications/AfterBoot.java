@@ -8,16 +8,14 @@ import com.mynotifications.notifications.MyNotification;
 import com.mynotifications.notifications.NotificationControl;
 
 /**
- * Created by nbp184 on 2016/04/07.
+ * Created by nbp184 on 2016/05/20.
  */
-public class MidnightHappenings extends BroadcastReceiver {
-
+public class AfterBoot extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        NotificationControl.loadIfNull(context, context.getFilesDir());
-        NotificationControl.midnightCheck();
-        MyNotification note = NotificationControl.getNextAlarm();
-        note.goToNextAndCheck(context);
+        if(intent.getAction().equals("android.intent.action.BOOT_COMPLETED")) {
+            NotificationControl.loadIfNull(context, context.getFilesDir());
+            NotificationControl.startFromBoot(context);
+        }
     }
-
 }

@@ -147,6 +147,27 @@ public class NotificationControl {
         }
     }
 
+    public static void startFromBoot(Context context) {
+        Calendar current = Calendar.getInstance();
+        MyNotification next = getNextAlarm();
+        if(next.next.before(current)) {
+            next.goToNextAndCheck(context);
+        } else {
+            AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+            if(nextAlarm < 0) {
+                Intent intent = new Intent(context, MidnightHappenings.class);
+                pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                alarmManager.set(AlarmManager.RTC_WAKEUP, next.next.getTimeInMillis(), pendingIntent);
+            } else {
+                SimpleDateFormat parser = new SimpleDateFormat("MMM d, yyyy h:mm:ss:SS aa");
+                System.out.println("setting \"" +next.name +"\" at " +parser.format(next.next.getTime()));
+                Intent intent = new Intent(context, NotificationPublisher.class);
+                pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                alarmManager.set(AlarmManager.RTC_WAKEUP, next.next.getTimeInMillis(), pendingIntent);
+            }
+        }
+    }
+
     public static MyNotification getNextAlarm() {
         if(nextAlarm >= 0) {
             return notifications.get(nextAlarm);
@@ -161,5 +182,4 @@ public class NotificationControl {
             }
         }
     }
-
 }
